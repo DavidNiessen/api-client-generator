@@ -18,7 +18,7 @@ data class ApiClient(
 
     fun findGeneratedJar() = file("${generatedFolder().absolutePath}/build/libs")
         .listFiles()
-        .find { it.name.endsWith(".jar") }
+        ?.find { it.name.endsWith(".jar") }
 
 }
 
