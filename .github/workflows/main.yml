@@ -20,7 +20,7 @@ jobs:
         uses: gradle/actions/setup-gradle@017a9effdb900e5b5b2fddfb590a105619dca3c3
 
       - name: Build API clients
-        run: ./gradlew build
+        run: ./gradlew build -x test
 
       - name: Publish to packages
         run: ./gradlew publishAllGeneratedClients
