@@ -59,7 +59,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(24)
+    jvmToolchain(21)
 }
 
 val buildGeneratedClients = tasks.register<Exec>("buildGeneratedClients") {
