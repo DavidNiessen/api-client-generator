@@ -6,5 +6,6 @@
   "modelPackage": "dev.niessen.api.clients.spotify.model",
   "configPackage": "dev.niessen.api.clients.spotify.configuration",
   "invokerPackage": "dev.niessen.api.clients.spotify.invoker",
-  "basePackage": "dev.niessen.api.clients.spotify.api"
+  "basePackage": "dev.niessen.api.clients.spotify.api",
+  "useJakartaEe": true
 }
