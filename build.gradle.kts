@@ -83,7 +83,7 @@ val buildGeneratedClients = tasks.register<Exec>("buildGeneratedClients") {
         commandLine(
             "sh", "-c",
             folders.joinToString(" && ") {
-                "cd ${it.absolutePath} && sh gradlew build"
+                "cd ${it.absolutePath} && sh ./gradlew build"
             }
         )
     }
