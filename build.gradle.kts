@@ -101,6 +101,13 @@ val buildGeneratedClients = tasks.register<Exec>("buildGeneratedClients") {
 // API CLIENT PUBLISHING
 //
 apiClients.forEach { client ->
+    val jarFile = client.findGeneratedJar()
+
+    if (jarFile == null) {
+        println("no jar found for ${client.name}")
+        return@forEach
+    }
+
     publishing {
         publications {
             create<MavenPublication>(client.name) {
@@ -108,9 +115,7 @@ apiClients.forEach { client ->
                 artifactId = client.name
                 version = System.currentTimeMillis().toString()
 
-                artifact(
-                    client.findGeneratedJar() ?: error("no jar found for ${client.name}")
-                )
+                artifact(jarFile)
             }
         }
 
