@@ -1,13 +1,29 @@
 import org.gradle.internal.extensions.stdlib.capitalized
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
+private val githubRepo: String = "api-client-generator"
+private val packagesUrl = "https://maven.pkg.github.com/DavidNiessen/$githubRepo"
+
 private val githubUser: String? = System.getenv("GITHUB_ACTOR")
 private val githubToken: String? = System.getenv("GITHUB_TOKEN")
-private val githubRepo: String = "api-client-generator"
 
 private val apiSpecsDir = file("$rootDir/api/")
 private val generatedClientsDir = file("$rootDir/generated/")
 
+group = "dev.niessen"
+version = "1.0-SNAPSHOT"
+
+repositories {
+    mavenCentral()
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+//
+// API CLIENT GENERATION
+//
 data class ApiClient(
     val name: String,
     val apiSpec: File,
@@ -51,17 +67,9 @@ val generateTasks = apiClients.map {
     }
 }
 
-group = "dev.niessen"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-kotlin {
-    jvmToolchain(21)
-}
-
+//
+// API CLIENT BUILDING
+//
 val buildGeneratedClients = tasks.register<Exec>("buildGeneratedClients") {
     mustRunAfter(generateTasks)
     group = "build"
@@ -89,48 +97,39 @@ val buildGeneratedClients = tasks.register<Exec>("buildGeneratedClients") {
     }
 }
 
+//
+// API CLIENT PUBLISHING
+//
 apiClients.forEach { client ->
-    val jarFile = client.findGeneratedJar()
+    publishing {
+        publications {
+            create<MavenPublication>(client.name) {
+                groupId = "dev.niessen"
+                artifactId = client.name
+                version = System.currentTimeMillis().toString()
 
-    if (jarFile != null) {
-        publishing {
-            publications {
-                create<MavenPublication>(client.name) {
-                    groupId = "dev.niessen"
-                    artifactId = client.name
-                    version = System.currentTimeMillis().toString()
-
-                    artifact(jarFile)
-                }
-            }
-
-            repositories {
-                maven {
-                    name = "GitHubPackages"
-                    url = uri("https://maven.pkg.github.com/DavidNiessen/$githubRepo")
-                    credentials {
-                        username = githubUser
-                        password = githubToken
-                    }
-                }
+                artifact(
+                    client.findGeneratedJar() ?: error("no jar found for ${client.name}")
+                )
             }
         }
 
-        tasks.register("publish${client.name.capitalized()}") {
-            group = "publishing"
-            dependsOn(buildGeneratedClients)
-            doLast {
-                println("Publishing ${client.name} to GitHub Packages")
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri(packagesUrl)
+                credentials {
+                    username = githubUser
+                    password = githubToken
+                }
             }
         }
-    } else {
-        println("⚠️ No JAR found for ${client.name}, skipping publishing")
     }
 }
 
 tasks.register("publishAllGeneratedClients") {
     group = "publishing"
-    dependsOn(apiClients.map { "publish${it.name.capitalized()}" })
+    dependsOn(apiClients.map { "publish${it.name.capitalized()}PublicationToGitHubPackagesRepository" })
 }
 
 tasks.named("compileKotlin") {
