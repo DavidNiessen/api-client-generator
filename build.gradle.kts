@@ -21,6 +21,13 @@ kotlin {
     jvmToolchain(21)
 }
 
+plugins {
+    kotlin("jvm") version "2.2.21"
+    id("org.openapi.generator") version "7.9.0"
+    id("maven-publish")
+    application
+}
+
 //
 // API CLIENT GENERATION
 //
@@ -51,19 +58,14 @@ val apiClients = apiSpecsDir.listFiles()
         ) else null
     } ?: emptyList()
 
-
-plugins {
-    kotlin("jvm") version "2.2.21"
-    id("org.openapi.generator") version "7.19.0"
-    id("maven-publish")
-    application
-}
-
 val generateTasks = apiClients.map {
     tasks.register<GenerateTask>("generate${it.name.capitalized()}ClientName") {
         this.inputSpec = it.apiSpec.absolutePath
         this.configFile = it.config.absolutePath
         this.outputDir = it.generatedFolder().absolutePath
+        this.importMappings = mapOf(
+            "BigDecimal" to "java.math.BigDecimal"
+        )
     }
 }
 
@@ -91,7 +93,7 @@ val buildGeneratedClients = tasks.register<Exec>("buildGeneratedClients") {
         commandLine(
             "sh", "-c",
             folders.joinToString(" && ") {
-                "set -x && cd ${it.absolutePath} && sh ./gradlew build -x test"
+                "set -x && cd ${it.absolutePath} && sh ./gradlew build -x test -Pjakarta_annotation_version=\"3.0.0\""
             }
         )
     }

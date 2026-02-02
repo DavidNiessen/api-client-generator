@@ -1,11 +1,12 @@
 {
   "generatorName": "java",
   "groupId": "dev.niessen",
-  "artifactId": "spotify-api-client-spring-kotlin",
+  "artifactId": "spotify-api-client-java17",
   "apiPackage": "dev.niessen.api.clients.spotify.api",
   "modelPackage": "dev.niessen.api.clients.spotify.model",
   "configPackage": "dev.niessen.api.clients.spotify.configuration",
   "invokerPackage": "dev.niessen.api.clients.spotify.invoker",
   "basePackage": "dev.niessen.api.clients.spotify.api",
+  "library": "jersey3",
   "useJakartaEe": true
 }
