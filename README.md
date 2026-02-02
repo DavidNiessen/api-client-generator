@@ -1,5 +1,5 @@
 # API Client Generator
-#### This project generates and publishes auto-generated clients from OpenAPI specifications.
+#### This project automatically generates and publishes api-clients from OpenAPI specifications.
 
 ### Add new client
 1. Go to /api/
